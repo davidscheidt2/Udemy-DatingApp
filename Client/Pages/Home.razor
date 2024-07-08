@@ -1,0 +1,25 @@
+﻿@page "/"
+@using Client.Users
+
+@inject HttpClient Http
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new Fluent Blazor app.
+
+<ul>
+@foreach (var user in users)
+{
+    <li>@user.Id - @user.UserName</li>
+}
+</ul>
+
+@code{
+    private AppUser[] users = [];
+    protected override async Task OnInitializedAsync()
+    {
+        users = await Http.GetFromJsonAsync<AppUser[]>("api/users") ?? [];
+    }
+}
