@@ -1,0 +1,84 @@
+@using Client.Users
+@using Client.Users.Service
+<FluentHeader Class="siteheader">
+    <a href="/" aria-label="Back to the homepage">
+        Dating App
+    </a>
+    @if (loggedIn)
+    {
+            <ul style="flex: auto">
+                <FluentAnchor Name="Home" Href="/">Matches</FluentAnchor>
+                <FluentAnchor Name="About" Href="/about">Lists</FluentAnchor>
+                <FluentAnchor Name="Services" Href="/services">Messages</FluentAnchor>
+            </ul>
+    }
+    <FluentSpacer />
+
+    @if (!loggedIn)
+    {
+        <div class="search">
+            <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+                <FluentTextField Name="username" @bind-Value="loginModel.Username" Placeholder="UserName"></FluentTextField>
+                <FluentTextField Name="password" TextFieldType="TextFieldType.Password" @bind-Value="loginModel.Password" Placeholder="Password"></FluentTextField>
+                <FluentButton Type="ButtonType.Submit" Icon="Login">Login</FluentButton>
+            </EditForm>
+        </div>
+    }
+    
+    @if (loggedIn)
+    {
+        <div class="search">
+            <FluentButton Id="btnOpen1" Appearance="Appearance.Accent" @onclick="@(() => open = !open)">
+                Welcome User
+            </FluentButton>
+            <FluentMenu Anchor="btnOpen1" @bind-Open="open">
+                <FluentMenuItem Name="Profile">Edit Profile</FluentMenuItem>
+                <FluentMenuItem Name="Logout" @onclick="@(Logout)">Logout</FluentMenuItem>
+            </FluentMenu>
+        </div>
+    }
+
+</FluentHeader>
+
+@code {
+    [SupplyParameterFromForm]
+    private LoginModel loginModel { get; set; } = new LoginModel{ Username = "", Password = "" };
+    
+    [Inject]
+    IAccountService AccountService { get; set; }
+    
+    bool loggedIn = false;
+    bool open = false;
+
+    private async Task HandleLogin()
+    {
+        var response = await AccountService.Login(loginModel);
+        
+        Console.WriteLine("Login");
+        Console.WriteLine(loginModel.Username + " " + loginModel.Password);
+        
+        UserDto user = null;
+
+        if (response.IsSuccessStatusCode)
+        {
+            loggedIn = true;
+            user = await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new Exception("Invalid response from server");
+            Console.WriteLine(user.Username + " " + user.Token);
+        }
+        else
+            Console.WriteLine("Invalid login attempt");
+
+        // if (response.IsSuccessStatusCode)
+        //     return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new Exception("Invalid response from server");
+        // else
+        //     throw new Exception("Invalid login attempt");
+        
+        Console.WriteLine("Did Login: " + loggedIn.ToString());
+    }
+    
+    private async Task Logout()
+    {
+        loggedIn = false;
+    }
+
+}
