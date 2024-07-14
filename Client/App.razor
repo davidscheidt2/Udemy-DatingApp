@@ -9,3 +9,23 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@code {
+    [Inject] AccountService AccountService { get; set; }
+    [Inject] ILocalStorageService LocalStorage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SetCurrentUser();
+    }
+    
+    private async Task SetCurrentUser()
+    {
+        var user = await LocalStorage.GetItemAsync<UserDto>("user");
+        if (user == null)
+        {
+            return;
+        }
+        AccountService.CurrentUser = user;
+    }
+}

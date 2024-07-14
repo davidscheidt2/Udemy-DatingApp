@@ -1,20 +1,22 @@
 @using Client.Users
 @using Client.Users.Service
+@inject AccountService AccountService
+
 <FluentHeader Class="siteheader">
     <a href="/" aria-label="Back to the homepage">
         Dating App
     </a>
-    @if (loggedIn)
+    @if (AccountService.CurrentUser != null)
     {
             <ul style="flex: auto">
-                <FluentAnchor Name="Home" Href="/">Matches</FluentAnchor>
-                <FluentAnchor Name="About" Href="/about">Lists</FluentAnchor>
-                <FluentAnchor Name="Services" Href="/services">Messages</FluentAnchor>
+                <FluentAnchor Name="Home" Appearance="Appearance.Hypertext" Href="/">Matches</FluentAnchor>
+                <FluentAnchor Name="About" Appearance="Appearance.Hypertext" Href="/about">Lists</FluentAnchor>
+                <FluentAnchor Name="Services" Appearance="Appearance.Hypertext" Href="/services">Messages</FluentAnchor>
             </ul>
     }
     <FluentSpacer />
 
-    @if (!loggedIn)
+    @if (AccountService.CurrentUser == null)
     {
         <div class="search">
             <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
@@ -25,14 +27,15 @@
         </div>
     }
     
-    @if (loggedIn)
+    @if (AccountService.CurrentUser != null)
     {
         <div class="search">
-            <FluentButton Id="btnOpen1" Appearance="Appearance.Accent" @onclick="@(() => open = !open)">
+            <FluentAnchor Id="welcomeAnchor" Appearance="Appearance.Hypertext" OnClick="@(() => open = !open)">
                 Welcome User
-            </FluentButton>
-            <FluentMenu Anchor="btnOpen1" @bind-Open="open">
+            </FluentAnchor>
+            <FluentMenu Anchor="welcomeAnchor" @bind-Open="open">
                 <FluentMenuItem Name="Profile">Edit Profile</FluentMenuItem>
+                <FluentDivider />
                 <FluentMenuItem Name="Logout" @onclick="@(Logout)">Logout</FluentMenuItem>
             </FluentMenu>
         </div>
@@ -41,44 +44,32 @@
 </FluentHeader>
 
 @code {
-    [SupplyParameterFromForm]
-    private LoginModel loginModel { get; set; } = new LoginModel{ Username = "", Password = "" };
-    
-    [Inject]
-    IAccountService AccountService { get; set; }
-    
-    bool loggedIn = false;
+    [SupplyParameterFromForm] private LoginModel loginModel { get; set; } = new LoginModel { Username = "", Password = "" };
+
+
     bool open = false;
+    
+    protected override void OnInitialized()
+    {
+        AccountService.OnChange += StateHasChanged;
+    }
+    
+    public void Dispose()
+    {
+        AccountService.OnChange -= StateHasChanged;
+    }
 
     private async Task HandleLogin()
     {
-        var response = await AccountService.Login(loginModel);
-        
         Console.WriteLine("Login");
         Console.WriteLine(loginModel.Username + " " + loginModel.Password);
         
-        UserDto user = null;
-
-        if (response.IsSuccessStatusCode)
-        {
-            loggedIn = true;
-            user = await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new Exception("Invalid response from server");
-            Console.WriteLine(user.Username + " " + user.Token);
-        }
-        else
-            Console.WriteLine("Invalid login attempt");
-
-        // if (response.IsSuccessStatusCode)
-        //     return await response.Content.ReadFromJsonAsync<UserDto>() ?? throw new Exception("Invalid response from server");
-        // else
-        //     throw new Exception("Invalid login attempt");
-        
-        Console.WriteLine("Did Login: " + loggedIn.ToString());
+        await AccountService.Login(loginModel);
     }
-    
+
     private async Task Logout()
     {
-        loggedIn = false;
+        await AccountService.Logout();
     }
 
 }

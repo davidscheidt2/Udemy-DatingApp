@@ -5,9 +5,23 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new Fluent Blazor app.
+@if (!registerMode)
+{
+    <div style="text-align: center">
+    <h1>Find your match</h1>
+    <p>Come on in to view your matches... all you need to do is sign up</p>
+    </div>
+    <div style="text-align: center">
+        <FluentButton Appearance="Appearance.Accent" Href="/register" OnClick="@(() => RegisterToggle())" >Register</FluentButton>
+        <FluentButton Href="">Learn more</FluentButton>
+    </div>
+}
+else
+{
+    <div>
+        Register form goes here
+    </div>
+}
 
 <ul>
 @foreach (var user in users)
@@ -17,9 +31,16 @@ Welcome to your new Fluent Blazor app.
 </ul>
 
 @code{
+    private bool registerMode = false;
+    
     private AppUser[] users = [];
     protected override async Task OnInitializedAsync()
     {
         users = await Http.GetFromJsonAsync<AppUser[]>("api/users") ?? [];
+    }
+    
+    public void RegisterToggle()
+    {
+        registerMode = !registerMode;
     }
 }
