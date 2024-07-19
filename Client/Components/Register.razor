@@ -1,0 +1,43 @@
+@inject AccountService AccountService
+
+<EditForm Model="@registerModel" OnValidSubmit="@RegisterUser">
+    <h2 class="fluent-title">Sign Up</h2>
+    <hr/>
+    <FluentTextField Name="username" @bind-Value="registerModel.Username" Placeholder="UserName" Label="Username"></FluentTextField>
+    <FluentTextField Name="password" TextFieldType="TextFieldType.Password" 
+                     @bind-Value="registerModel.Password" Placeholder="Password" Label="Password"></FluentTextField>
+    <div style="text-align: center">
+        <FluentButton Type="ButtonType.Submit">Register</FluentButton>
+        <FluentButton OnClick="@Cancel">Cancel</FluentButton>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnCancelRegister { get; set; }
+    
+    RegisterModel registerModel = new()
+    {
+        Username = string.Empty,
+        Password = string.Empty
+    };
+
+    private async Task RegisterUser()
+    {
+        try
+        {
+            await AccountService.Register(registerModel);
+            await OnCancelRegister.InvokeAsync(false);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+    
+    private async Task Cancel()
+    {
+        await OnCancelRegister.InvokeAsync(false);
+    }
+}

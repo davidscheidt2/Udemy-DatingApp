@@ -1,7 +1,5 @@
 ﻿@page "/"
-@using Client.Users
-
-@inject HttpClient Http
+@using Client.Components
 
 <PageTitle>Home</PageTitle>
 
@@ -18,28 +16,20 @@
 }
 else
 {
-    <div>
-        Register form goes here
+    <div style="text-align: center">
+        <Register OnCancelRegister="CancelRegisterMode"/>
     </div>
 }
-
-<ul>
-@foreach (var user in users)
-{
-    <li>@user.Id - @user.UserName</li>
-}
-</ul>
 
 @code{
     private bool registerMode = false;
     
-    private AppUser[] users = [];
-    protected override async Task OnInitializedAsync()
+    private void CancelRegisterMode(bool register)
     {
-        users = await Http.GetFromJsonAsync<AppUser[]>("api/users") ?? [];
+        registerMode = register;
     }
-    
-    public void RegisterToggle()
+
+    private void RegisterToggle()
     {
         registerMode = !registerMode;
     }

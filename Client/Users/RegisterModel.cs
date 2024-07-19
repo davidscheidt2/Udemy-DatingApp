@@ -1,10 +1,7 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Client.Users;
 
-public class LoginModel
+public class RegisterModel
 {
     public required string Username { get; set; }
     public required string Password { get; set; }
 }
-

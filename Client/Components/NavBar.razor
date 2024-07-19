@@ -1,29 +1,31 @@
-@using Client.Users
-@using Client.Users.Service
 @inject AccountService AccountService
 
 <FluentHeader Class="siteheader">
-    <a href="/" aria-label="Back to the homepage">
-        Dating App
-    </a>
-    @if (AccountService.CurrentUser != null)
-    {
-            <ul style="flex: auto">
-                <FluentAnchor Name="Home" Appearance="Appearance.Hypertext" Href="/">Matches</FluentAnchor>
-                <FluentAnchor Name="About" Appearance="Appearance.Hypertext" Href="/about">Lists</FluentAnchor>
-                <FluentAnchor Name="Services" Appearance="Appearance.Hypertext" Href="/services">Messages</FluentAnchor>
-            </ul>
-    }
+    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+        <FluentAnchor Appearance="Appearance.Hypertext" Href="/">Dating App</FluentAnchor>
+
+        @if (AccountService.CurrentUser != null)
+        {
+
+            <FluentAnchor Name="Home" Appearance="Appearance.Hypertext" Href="/">Matches</FluentAnchor>
+            <FluentAnchor Name="About" Appearance="Appearance.Hypertext" Href="/about">Lists</FluentAnchor>
+            <FluentAnchor Name="Services" Appearance="Appearance.Hypertext" Href="/services">Messages</FluentAnchor>
+        }
+    </FluentStack>        
     <FluentSpacer />
 
     @if (AccountService.CurrentUser == null)
     {
         <div class="search">
-            <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
-                <FluentTextField Name="username" @bind-Value="loginModel.Username" Placeholder="UserName"></FluentTextField>
-                <FluentTextField Name="password" TextFieldType="TextFieldType.Password" @bind-Value="loginModel.Password" Placeholder="Password"></FluentTextField>
-                <FluentButton Type="ButtonType.Submit" Icon="Login">Login</FluentButton>
-            </EditForm>
+        <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+            <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+
+            <FluentTextField Name="username" @bind-Value="loginModel.Username" Placeholder="UserName"></FluentTextField>
+            <FluentTextField Name="password" TextFieldType="TextFieldType.Password" @bind-Value="loginModel.Password" Placeholder="Password"></FluentTextField>
+            <FluentButton Type="ButtonType.Submit" Icon="Login">Login</FluentButton>
+            </FluentStack>
+            
+        </EditForm>
         </div>
     }
     
@@ -44,8 +46,8 @@
 </FluentHeader>
 
 @code {
-    [SupplyParameterFromForm] private LoginModel loginModel { get; set; } = new LoginModel { Username = "", Password = "" };
-
+    [SupplyParameterFromForm] private LoginModel loginModel { get; set; } 
+        = new() { Username = String.Empty, Password = String.Empty};
 
     bool open = false;
     
