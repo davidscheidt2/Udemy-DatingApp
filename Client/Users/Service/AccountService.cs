@@ -17,7 +17,7 @@ public class AccountService(HttpClient client, ILocalStorageService localStorage
             Console.WriteLine(user.Username + " " + user.Token);
         }
         else
-            Console.WriteLine("Invalid login attempt");
+            throw new ArgumentException(response.Content.ReadAsStringAsync().Result);
     }
     
     public async Task Register(RegisterModel register)
@@ -32,9 +32,8 @@ public class AccountService(HttpClient client, ILocalStorageService localStorage
             Console.WriteLine(user.Username + " " + user.Token);
         }
         else
-            Console.WriteLine("Invalid register attempt");
+            throw new ArgumentException(response.Content.ReadAsStringAsync().Result);
     }
-    
 
     private UserDto? _currentUser;
 

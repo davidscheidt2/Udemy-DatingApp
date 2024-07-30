@@ -1,49 +1,68 @@
 @inject AccountService AccountService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IToastService ToastService
 
 <FluentHeader Class="siteheader">
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
         <FluentAnchor Appearance="Appearance.Hypertext" Href="/">Dating App</FluentAnchor>
 
-        @if (AccountService.CurrentUser != null)
-        {
-
-            <FluentAnchor Name="Home" Appearance="Appearance.Hypertext" Href="/">Matches</FluentAnchor>
-            <FluentAnchor Name="About" Appearance="Appearance.Hypertext" Href="/about">Lists</FluentAnchor>
-            <FluentAnchor Name="Services" Appearance="Appearance.Hypertext" Href="/services">Messages</FluentAnchor>
-        }
+        <AuthorizeView>
+            <Authorized>
+                <FluentNavMenu Class="fluent-nav-menu-line">
+                    <FluentNavLink Name="Matches" Href="/members">Matches</FluentNavLink>
+                    <FluentNavLink Name="Lists" Href="/lists">Lists</FluentNavLink>
+                    <FluentNavLink Name="Members" Href="/messages">Messages</FluentNavLink>
+                </FluentNavMenu>
+            </Authorized>
+        </AuthorizeView>
     </FluentStack>        
     <FluentSpacer />
 
-    @if (AccountService.CurrentUser == null)
-    {
-        <div class="search">
-        <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
-            <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
+    <AuthorizeView>
+        <Authorized>
+            <div class="search">
+                <FluentAnchor Id="welcomeAnchor" Appearance="Appearance.Hypertext" OnClick="@(() => open = !open)">
+                    Welcome User
+                </FluentAnchor>
+                <FluentMenu Anchor="welcomeAnchor" @bind-Open="open">
+                    <FluentMenuItem Name="Profile">Edit Profile</FluentMenuItem>
+                    <FluentDivider />
+                    <FluentMenuItem Name="Logout" @onclick="@(Logout)">Logout</FluentMenuItem>
+                </FluentMenu>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="search">
+                <EditForm Context="formContext" Model="@loginModel" OnValidSubmit="@HandleLogin">
+                    <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
 
-            <FluentTextField Name="username" @bind-Value="loginModel.Username" Placeholder="UserName"></FluentTextField>
-            <FluentTextField Name="password" TextFieldType="TextFieldType.Password" @bind-Value="loginModel.Password" Placeholder="Password"></FluentTextField>
-            <FluentButton Type="ButtonType.Submit" Icon="Login">Login</FluentButton>
-            </FluentStack>
-            
-        </EditForm>
-        </div>
-    }
-    
-    @if (AccountService.CurrentUser != null)
-    {
-        <div class="search">
-            <FluentAnchor Id="welcomeAnchor" Appearance="Appearance.Hypertext" OnClick="@(() => open = !open)">
-                Welcome User
-            </FluentAnchor>
-            <FluentMenu Anchor="welcomeAnchor" @bind-Open="open">
-                <FluentMenuItem Name="Profile">Edit Profile</FluentMenuItem>
-                <FluentDivider />
-                <FluentMenuItem Name="Logout" @onclick="@(Logout)">Logout</FluentMenuItem>
-            </FluentMenu>
-        </div>
-    }
-
+                        <FluentTextField Name="username" @bind-Value="loginModel.Username" Placeholder="UserName"></FluentTextField>
+                        <FluentTextField Name="password" TextFieldType="TextFieldType.Password" @bind-Value="loginModel.Password" Placeholder="Password"></FluentTextField>
+                        <FluentButton Type="ButtonType.Submit" Icon="Login">Login</FluentButton>
+                    </FluentStack>
+                </EditForm>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 </FluentHeader>
+
+<style>
+    /* FluentNavMenu | FluentNavLink - makes the navigation menu a "one liner" */
+    .fluent-nav-menu-line {
+        width: auto !important;
+    }
+
+    .fluent-nav-menu-line .fluent-nav-item {
+        background-color: var(--neutral-layer-4) !important;
+        display: inline-flex;
+    }
+
+    .fluent-nav-menu-line .fluent-nav-text:not(:empty) {
+        width: unset !important;
+        margin-inline-end: calc(var(--design-unit) * 2px + 2px);
+    }
+</style>
 
 @code {
     [SupplyParameterFromForm] private LoginModel loginModel { get; set; } 
@@ -63,15 +82,24 @@
 
     private async Task HandleLogin()
     {
-        Console.WriteLine("Login");
-        Console.WriteLine(loginModel.Username + " " + loginModel.Password);
-        
-        await AccountService.Login(loginModel);
+        try
+        {
+            await AccountService.Login(loginModel);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            Navigation.NavigateTo("/members");
+            loginModel = new() { Username = String.Empty, Password = String.Empty};
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowError(e.Message);
+        }
     }
 
     private async Task Logout()
     {
         await AccountService.Logout();
+        await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        Navigation.NavigateTo("/");
     }
 
 }

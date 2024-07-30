@@ -1,4 +1,6 @@
 @inject AccountService AccountService
+@inject IToastService ToastService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <EditForm Model="@registerModel" OnValidSubmit="@RegisterUser">
     <h2 class="fluent-title">Sign Up</h2>
@@ -28,11 +30,12 @@
         try
         {
             await AccountService.Register(registerModel);
+            await AuthenticationStateProvider.GetAuthenticationStateAsync();
             await OnCancelRegister.InvokeAsync(false);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            ToastService.ShowError(e.Message);
         }
     }
     
