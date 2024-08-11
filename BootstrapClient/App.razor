@@ -1,5 +1,4 @@
-﻿@using Client.Components
-@inject AccountService AccountService
+﻿@inject AccountService AccountService
 @inject ILocalStorageService LocalStorage
 
 <CascadingAuthenticationState>
@@ -7,12 +6,12 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <HandleUnauthorizedAttempt />
+                    @* <HandleUnauthorizedAttempt /> *@
                 </NotAuthorized>
             </AuthorizeRouteView>
         </Found>
         <NotFound>
-            <RedirectToHome />
+            @* <RedirectToHome /> *@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>

@@ -7,22 +7,23 @@
     <FluentStack Orientation="Orientation.Horizontal" VerticalAlignment="VerticalAlignment.Center">
         <FluentAnchor Appearance="Appearance.Hypertext" Href="/">Dating App</FluentAnchor>
 
-        <AuthorizeView>
-            <Authorized>
-                <FluentNavMenu Class="fluent-nav-menu-line">
+        <FluentNavMenu Class="fluent-nav-menu-line">
+            <AuthorizeView>
+                <Authorized>
                     <FluentNavLink Name="Matches" Href="/members">Matches</FluentNavLink>
                     <FluentNavLink Name="Lists" Href="/lists">Lists</FluentNavLink>
                     <FluentNavLink Name="Members" Href="/messages">Messages</FluentNavLink>
-                </FluentNavMenu>
-            </Authorized>
-        </AuthorizeView>
+                </Authorized>
+            </AuthorizeView>
+        </FluentNavMenu>
+        
     </FluentStack>        
     <FluentSpacer />
 
     <AuthorizeView>
         <Authorized>
             <div class="search">
-                <FluentAnchor Id="welcomeAnchor" Appearance="Appearance.Hypertext" OnClick="@(() => open = !open)">
+                <FluentAnchor Id="welcomeAnchor" Appearance="Appearance.Hypertext" Href="#" OnClick="@(() => open = !open)">
                     Welcome User
                 </FluentAnchor>
                 <FluentMenu Anchor="welcomeAnchor" @bind-Open="open">

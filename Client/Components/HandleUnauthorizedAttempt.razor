@@ -1,0 +1,9 @@
+@inject IToastService ToastService
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        ToastService.ShowError("You must be logged in to access this page.");
+    }
+}

@@ -18,6 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Client\Client.csproj" />
+    <ProjectReference Include="..\BootstrapClient\BootstrapClient.csproj" />
   </ItemGroup>
 </Project>
