@@ -23,12 +23,13 @@ app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials(
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseWebAssemblyDebugging();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseWebAssemblyDebugging();
+// }
 
-app.UseBlazorFrameworkFiles();
+// app.UseBlazorFrameworkFiles();
+app.UseDefaultFiles();
 app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
